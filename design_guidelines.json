@@ -1,0 +1,137 @@
+{
+  "project_name": "NIW AI Marketing 3D Experience",
+  "theme": "light",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) + Cloud/Glass aesthetics",
+  "colors": {
+    "background_primary": "#FFFFFF",
+    "background_secondary": "#F0F9FF",
+    "primary": "#0EA5E9",
+    "primary_hover": "#0284C7",
+    "secondary": "#E0F2FE",
+    "accent": "#38BDF8",
+    "text_main": "#0F172A",
+    "text_muted": "#475569",
+    "border_color": "rgba(14, 165, 233, 0.15)",
+    "glass_surface_light": "rgba(255, 255, 255, 0.7)",
+    "glass_border": "rgba(255, 255, 255, 0.5)",
+    "3d_materials": {
+      "sky_blue_glass": {
+        "color": "#0EA5E9",
+        "transmission": 0.9,
+        "opacity": 1,
+        "metalness": 0.1,
+        "roughness": 0.05,
+        "ior": 1.5,
+        "thickness": 0.5
+      },
+      "white_glossy": {
+        "color": "#FFFFFF",
+        "metalness": 0.2,
+        "roughness": 0.1,
+        "envMapIntensity": 1.0
+      }
+    }
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Outfit, sans-serif",
+      "weights": ["300", "500", "800"],
+      "h1": "text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tighter",
+      "h2": "text-4xl sm:text-5xl font-bold tracking-tight",
+      "h3": "text-2xl sm:text-3xl font-semibold tracking-tight"
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["400", "500", "600"],
+      "base": "text-base sm:text-lg leading-relaxed text-slate-700",
+      "small": "text-sm font-medium tracking-wide uppercase text-sky-600"
+    }
+  },
+  "layout": {
+    "grid_system": "Bento Grid Protocol (Mode A - Tetris Grid)",
+    "spacing": "Generous (p-8 to p-24)",
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "radius": {
+      "card": "rounded-3xl",
+      "button": "rounded-full"
+    }
+  },
+  "surfaces_and_effects": {
+    "glassmorphism": {
+      "background": "bg-white/70",
+      "blur": "backdrop-blur-2xl backdrop-saturate-150",
+      "border": "border border-white/60",
+      "shadow": "shadow-[0_8px_32px_rgba(14,165,233,0.08)]"
+    },
+    "tracing_beam_accent": {
+      "border": "border-sky-500/30",
+      "glow": "drop-shadow-[0_0_15px_rgba(14,165,233,0.5)]"
+    }
+  },
+  "animations": {
+    "global_3d": {
+      "engine": "React Three Fiber (@react-three/fiber) + Drei",
+      "behavior": "Continuous floating and rotating, mapped to scroll position via framer-motion useScroll or Drei ScrollControls. Camera reacts to mouse movement."
+    },
+    "dom_elements": {
+      "engine": "Framer Motion",
+      "reveal": "initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}",
+      "hover": "whileHover={{ scale: 1.02, y: -5 }}",
+      "parallax": "Use useTransform to move DOM elements at different speeds than scroll"
+    }
+  },
+  "components_instructions": {
+    "3d_hero": "Full screen HTML section overlaid on a global R3F Canvas. Canvas should feature large sky-blue floating icosahedrons and white glossy toruses. Use Drei's <Float> for idle motion. Overlay HTML uses ultra-bold 'Outfit' text.",
+    "3d_service_cards": "Use Glassmorphism specs. Add a 3D R3F Canvas inside the card containing a rotating abstract icon (e.g., floating graph, glowing sphere) for each service.",
+    "trust_strip": "Horizontal Marquee (react-fast-marquee) with high-contrast logos, moving slowly, spaced generously (gap-24).",
+    "floating_whatsapp": "Fixed bottom-right button with a continuous floating animation (y-axis sine wave via Framer Motion) and glowing drop-shadow.",
+    "pricing_cards": "Bento-style layout. Middle tier should be 'lifted' visually using scale and a stronger sky-blue glowing shadow. Use 3D hover tilt effects (framer-motion useMotionValue).",
+    "navigation": "Sticky top with 'Glassmorphism' specs. Must contain brand text, links, and primary CTA. Shrinks slightly on scroll.",
+    "buttons": "Pill-shaped (rounded-full). Primary uses bg-sky-500 text-white hover:bg-sky-600. Add subtle scale on click.",
+    "testing": "All interactive elements MUST have role-based data-testid attributes (e.g., data-testid='hero-cta-button')."
+  },
+  "image_urls": {
+    "hero_backgrounds": [
+      {
+        "url": "https://images.unsplash.com/photo-1764346452651-2d1fae25d4fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMDNkJTIwYmx1ZSUyMGdsYXNzJTIwc3BoZXJlc3xlbnwwfHx8fDE3NzU4NTIzNDh8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract blue and purple spheres with reflections - Use for Hero 3D textures or fallback background",
+        "category": "hero_texture"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1543781826-35d17354536c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwyfHx3aGl0ZSUyMG1pbmltYWwlMjBnZW9tZXRyaWMlMjBhcmNoaXRlY3R1cmUlMjBza3l8ZW58MHx8fHwxNzc1ODUyMzUyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "White minimal architecture - Use for clean service section background or about us",
+        "category": "section_background"
+      }
+    ],
+    "mockups": [
+      {
+        "url": "https://images.unsplash.com/photo-1763718528755-4bca23f82ac3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwyfHxkYXNoYm9hcmQlMjBhbmFseXRpY3MlMjBpbnRlcmZhY2V8ZW58MHx8fHwxNzc1ODUyMzUyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Employer dashboard showing application trends - Use in 'How It Works' or 'Results' section",
+        "category": "dashboard_mockup"
+      }
+    ],
+    "logos": [
+      {
+        "url": "https://images.unsplash.com/photo-1670850664664-d8ed42d767fa?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NjZ8MHwxfHNlYXJjaHw0fHxjb21wYW55JTIwbG9nbyUyMGJyYW5kJTIwaWRlbnRpdHklMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc1ODUyMzUyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Generic white bag/logo placeholder - Use for trust strip",
+        "category": "trust_logo"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1763705857736-2b4f16a33758?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NjZ8MHwxfHNlYXJjaHwyfHxjb21wYW55JTIwbG9nbyUyMGJyYW5kJTIwaWRlbnRpdHklMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc1ODUyMzUyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Orange card with 'one' logo - Use for trust strip",
+        "category": "trust_logo"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "INSTALL DEPENDENCIES: `yarn add three @react-three/fiber @react-three/drei framer-motion framer-motion-3d react-fast-marquee lucide-react`",
+    "Do NOT use TypeScript (.tsx). Use Javascript (.js / .jsx) for all components.",
+    "Implement a global `<Canvas>` component in the main App layout that covers the entire screen (`position: fixed, top: 0, left: 0, z-index: -1`). Add lighting (`<ambientLight>`, `<directionalLight>`) and floating shapes using `<Float>` from drei.",
+    "Overlay standard DOM elements on top using Framer Motion for scroll reveals. Use high-end glassmorphism for cards so the 3D shapes are visible behind them.",
+    "Use the `MeshPhysicalMaterial` from Three.js for shapes to achieve the requested 'glassy sky blue' and 'white' aesthetic. Reference the `3d_materials` spec in this JSON.",
+    "For specific 3D elements inside DOM (like a 3D card), you can embed separate small `<Canvas>` elements inside the specific component div, or use Framer Motion 3D.",
+    "Ensure all sections (Hero, Services, Pricing, etc.) heavily utilize vertical spacing (p-24) to allow room for background parallax effects.",
+    "Implement the floating WhatsApp button as a fixed element with a continuous y-axis Framer Motion animation.",
+    "DO NOT USE PLACEHOLDERS. Use the image_urls provided in this guideline for textures and mockups."
+  ]
+}
