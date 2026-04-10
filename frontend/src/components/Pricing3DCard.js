@@ -5,77 +5,52 @@ import { CheckCircle, Sparkles } from 'lucide-react';
 export const Pricing3DCard = ({ pkg, idx }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 100, rotateX: -30, scale: 0.8 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ 
-        duration: 0.9, 
-        delay: idx * 0.2,
-        ease: [0.16, 1, 0.3, 1]
-      }}
-      whileHover={{ 
-        scale: 1.08, 
-        rotateY: 5,
-        y: -30,
-        transition: { duration: 0.4 }
-      }}
-      className={`relative glass-strong rounded-3xl p-10 card-3d overflow-hidden ${
-        pkg.popular ? 'border-2 border-pink-500/50 scale-110 glow' : ''
+      transition={{ duration: 0.5, delay: idx * 0.1 }}
+      whileHover={{ scale: 1.05, y: -15 }}
+      className={`relative glass rounded-3xl p-8 card-3d ${
+        pkg.popular ? 'border-2 border-cyan-400 scale-105' : ''
       }`}
-      style={{
-        transformStyle: 'preserve-3d',
-      }}
       data-testid={`pricing-card-${pkg.name.toLowerCase()}`}
     >
-      {/* Morphing background blob */}
       {pkg.popular && (
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 via-pink-600/20 to-cyan-600/20 opacity-50 blob"></div>
-      )}
-      
-      {pkg.popular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-8 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-bold flex items-center gap-2 glow" style={{ transform: 'translateZ(60px)' }}>
-          <Sparkles size={16} fill="currentColor" className="animate-pulse" />
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full text-sm font-bold flex items-center gap-2">
+          <Sparkles size={16} fill="currentColor" />
           <span>MOST POPULAR</span>
-          <Sparkles size={16} fill="currentColor" className="animate-pulse" />
+          <Sparkles size={16} fill="currentColor" />
         </div>
       )}
       
-      <div className="relative z-10 text-center mb-8" style={{ transform: 'translateZ(40px)' }}>
-        <h3 className="text-4xl font-extrabold mb-4 text-gradient">{pkg.name}</h3>
-        <div className="mb-3">
-          <span className="text-6xl font-extrabold text-white">{pkg.price}</span>
-          <span className="text-white/60 text-xl ml-2">{pkg.period}</span>
+      <div className="text-center mb-6">
+        <h3 className="text-3xl font-bold mb-3 text-white">{pkg.name}</h3>
+        <div className="mb-2">
+          <span className={`text-5xl font-extrabold ${pkg.popular ? 'text-cyan-400' : 'text-white'}`}>{pkg.price}</span>
+          <span className="text-white/60 text-lg">{pkg.period}</span>
         </div>
         <p className="text-sm text-white/70">{pkg.fit}</p>
       </div>
 
-      <ul className="space-y-4 mb-10 relative z-10">
+      <ul className="space-y-3 mb-8">
         {pkg.features.map((feature, i) => (
-          <motion.li 
-            key={i} 
-            className="flex items-start gap-3"
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <CheckCircle size={22} className="flex-shrink-0 mt-0.5 text-purple-400" />
+          <li key={i} className="flex items-start gap-3">
+            <CheckCircle size={20} className="flex-shrink-0 mt-0.5 text-cyan-400" />
             <span className="text-sm text-white/90">{feature}</span>
-          </motion.li>
+          </li>
         ))}
       </ul>
 
       <Link to="/pricing">
         <motion.button
-          whileHover={{ scale: 1.08, y: -5 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className={`w-full py-4 rounded-full font-bold text-lg btn-3d text-white relative overflow-hidden ${
-            pkg.popular ? 'bg-gradient-to-r from-purple-600 to-pink-600' : ''
-          }`}
-          style={{ transform: 'translateZ(50px)' }}
+          className={`w-full py-3 rounded-full font-bold text-lg ${
+            pkg.popular ? 'btn-primary' : 'btn-secondary'
+          } text-white`}
           data-testid={`pricing-cta-${pkg.name.toLowerCase()}`}
         >
-          <span className="relative z-10">Choose {pkg.name}</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+          Choose {pkg.name}
         </motion.button>
       </Link>
     </motion.div>

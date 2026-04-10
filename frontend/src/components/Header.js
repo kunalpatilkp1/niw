@@ -38,13 +38,13 @@ const Header = () => {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center text-sm">
           <div className="flex items-center gap-6">
-            <span className="font-medium">📞 Call/WhatsApp: +91 98765 43210</span>
-            <span className="hidden md:block text-white/80">AI-Powered Digital Marketing for Growing Businesses</span>
+            <span className="font-medium">📞 +91 98765 43210</span>
+            <span className="hidden md:block text-white/80">AI-Powered Digital Marketing</span>
           </div>
           <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="btn-3d px-6 py-2 rounded-full font-bold text-sm text-white"
+            className="btn-primary px-6 py-2 rounded-full font-bold text-sm text-white"
             data-testid="top-book-consultation-btn"
           >
             Book Free Consultation
@@ -55,9 +55,7 @@ const Header = () => {
       {/* Main Header */}
       <motion.header
         style={{ y: headerY }}
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'glass-strong' : 'glass'
-        }`}
+        className={`sticky top-0 z-50 ${isScrolled ? 'glass' : 'bg-transparent'}`}
       >
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
@@ -98,9 +96,9 @@ const Header = () => {
             <div className="hidden lg:flex items-center gap-4">
               <Link to="/contact">
                 <motion.button
-                  whileHover={{ scale: 1.08, y: -3 }}
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="btn-3d px-7 py-3 rounded-full font-bold text-sm text-white"
+                  className="btn-primary px-7 py-3 rounded-full font-bold text-sm text-white"
                   data-testid="header-get-started-btn"
                 >
                   Get Started
@@ -110,9 +108,9 @@ const Header = () => {
                 href="https://wa.me/919876543210"
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.08, y: -3 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="glass px-7 py-3 rounded-full font-bold text-sm text-white border border-white/20"
+                className="btn-secondary px-7 py-3 rounded-full font-bold text-sm text-white"
                 data-testid="header-whatsapp-btn"
               >
                 WhatsApp Us
