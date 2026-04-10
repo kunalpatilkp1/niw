@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -9,20 +9,14 @@ export const Scene3D = () => {
   const canvasRef = useRef(null);
   const mouseX = useRef(0);
   const mouseY = useRef(0);
-  const cursorTrailRef = useRef([]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // Scene
     const scene = new THREE.Scene();
-    scene.background = null;
-
-    // Camera
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 6;
+    camera.position.z = 8;
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
       alpha: true,
@@ -32,129 +26,116 @@ export const Scene3D = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
+    // PARTICLE SYSTEM - Thousands of flowing particles
+    const particleCount = 3000;
+    const particles = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
 
-    const light1 = new THREE.PointLight(0x667eea, 3);
-    light1.position.set(5, 5, 5);
-    scene.add(light1);
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 50;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 50;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
 
-    const light2 = new THREE.PointLight(0xf093fb, 3);
-    light2.position.set(-5, -5, 5);
-    scene.add(light2);
+      // Gradient colors (purple, pink, cyan)
+      const colorChoice = Math.random();
+      if (colorChoice < 0.33) {
+        colors[i * 3] = 0.4; // R
+        colors[i * 3 + 1] = 0.3; // G
+        colors[i * 3 + 2] = 0.9; // B (purple)
+      } else if (colorChoice < 0.66) {
+        colors[i * 3] = 0.9;
+        colors[i * 3 + 1] = 0.3;
+        colors[i * 3 + 2] = 0.7; // (pink)
+      } else {
+        colors[i * 3] = 0.0;
+        colors[i * 3 + 1] = 0.8;
+        colors[i * 3 + 2] = 1.0; // (cyan)
+      }
 
-    const light3 = new THREE.PointLight(0x00d4ff, 2);
-    light3.position.set(0, 5, -5);
-    scene.add(light3);
+      sizes[i] = Math.random() * 2;
+    }
 
-    // Create MORE 3D objects
-    const objects = [];
+    particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
-    // Sphere 1 - Glass
-    const sphere1 = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 32, 32),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x667eea,
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 0.08,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+    });
+
+    const particleSystem = new THREE.Points(particles, particleMaterial);
+    scene.add(particleSystem);
+
+    // WAVE LINES - Flowing energy lines
+    const lineCount = 50;
+    const lines = [];
+    
+    for (let i = 0; i < lineCount; i++) {
+      const lineGeometry = new THREE.BufferGeometry();
+      const linePositions = new Float32Array(100 * 3);
+      
+      for (let j = 0; j < 100; j++) {
+        linePositions[j * 3] = (j - 50) * 0.2;
+        linePositions[j * 3 + 1] = Math.sin(j * 0.1) * 2 + (i - lineCount / 2) * 0.5;
+        linePositions[j * 3 + 2] = -10 + i * 0.3;
+      }
+      
+      lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+      
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: i % 3 === 0 ? 0x667eea : i % 3 === 1 ? 0xf093fb : 0x00d4ff,
         transparent: true,
-        opacity: 0.7,
-        metalness: 0.5,
-        roughness: 0.1,
-        transmission: 0.5,
-        clearcoat: 1,
-      })
-    );
-    sphere1.position.set(-3, 2, -3);
-    scene.add(sphere1);
-    objects.push({ mesh: sphere1, speed: 1 });
+        opacity: 0.3,
+        blending: THREE.AdditiveBlending,
+      });
+      
+      const line = new THREE.Line(lineGeometry, lineMaterial);
+      scene.add(line);
+      lines.push({ mesh: line, offset: i * 0.1 });
+    }
 
-    // Sphere 2 - Metallic
-    const sphere2 = new THREE.Mesh(
-      new THREE.SphereGeometry(1.5, 32, 32),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x764ba2,
-        transparent: true,
-        opacity: 0.8,
-        metalness: 0.9,
-        roughness: 0.05,
-        clearcoat: 1,
-      })
-    );
-    sphere2.position.set(3, -2, -4);
-    scene.add(sphere2);
-    objects.push({ mesh: sphere2, speed: 1.2 });
-
-    // Sphere 3 - Glowing
-    const sphere3 = new THREE.Mesh(
-      new THREE.SphereGeometry(1.2, 32, 32),
-      new THREE.MeshPhysicalMaterial({
-        color: 0xf093fb,
+    // GLOWING ORBS - Pulsating energy spheres
+    const orbs = [];
+    for (let i = 0; i < 12; i++) {
+      const orbGeometry = new THREE.SphereGeometry(0.3 + Math.random() * 0.5, 16, 16);
+      const orbMaterial = new THREE.MeshBasicMaterial({
+        color: i % 3 === 0 ? 0x667eea : i % 3 === 1 ? 0xf093fb : 0x00d4ff,
         transparent: true,
         opacity: 0.6,
-        metalness: 0.6,
-        roughness: 0.2,
-        emissive: 0xf093fb,
-        emissiveIntensity: 0.5,
-      })
-    );
-    sphere3.position.set(0, 0, -5);
-    scene.add(sphere3);
-    objects.push({ mesh: sphere3, speed: 0.8 });
+        blending: THREE.AdditiveBlending,
+      });
+      
+      const orb = new THREE.Mesh(orbGeometry, orbMaterial);
+      orb.position.set(
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20
+      );
+      
+      scene.add(orb);
+      orbs.push({ mesh: orb, speed: 0.5 + Math.random() * 1 });
+    }
 
-    // Torus 1
-    const torus1 = new THREE.Mesh(
-      new THREE.TorusGeometry(1, 0.4, 16, 50),
-      new THREE.MeshStandardMaterial({
-        color: 0x8e9aff,
-        metalness: 0.9,
-        roughness: 0.1,
-      })
-    );
-    torus1.position.set(-2, -3, -2);
-    scene.add(torus1);
-    objects.push({ mesh: torus1, speed: 1.5 });
+    // LIGHTING
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
 
-    // Torus 2
-    const torus2 = new THREE.Mesh(
-      new THREE.TorusGeometry(0.8, 0.3, 16, 50),
-      new THREE.MeshStandardMaterial({
-        color: 0x00d4ff,
-        metalness: 0.8,
-        roughness: 0.2,
-      })
-    );
-    torus2.position.set(4, 3, -3);
-    scene.add(torus2);
-    objects.push({ mesh: torus2, speed: 1.3 });
+    const pointLight1 = new THREE.PointLight(0x667eea, 2);
+    pointLight1.position.set(10, 10, 10);
+    scene.add(pointLight1);
 
-    // Box
-    const box = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshPhysicalMaterial({
-        color: 0xffffff,
-        metalness: 0.7,
-        roughness: 0.3,
-        clearcoat: 1,
-      })
-    );
-    box.position.set(-4, 1, -2);
-    scene.add(box);
-    objects.push({ mesh: box, speed: 1.1 });
+    const pointLight2 = new THREE.PointLight(0xf093fb, 2);
+    pointLight2.position.set(-10, -10, 10);
+    scene.add(pointLight2);
 
-    // Octahedron
-    const octa = new THREE.Mesh(
-      new THREE.OctahedronGeometry(0.9),
-      new THREE.MeshStandardMaterial({
-        color: 0xff6b9d,
-        metalness: 0.8,
-        roughness: 0.2,
-      })
-    );
-    octa.position.set(2, 4, -4);
-    scene.add(octa);
-    objects.push({ mesh: octa, speed: 0.9 });
-
-    // Animation
+    // ANIMATION
     let animationId;
     const clock = new THREE.Clock();
 
@@ -162,61 +143,96 @@ export const Scene3D = () => {
       animationId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      // Animate all objects
-      objects.forEach((obj, i) => {
-        const { mesh, speed } = obj;
-        mesh.rotation.x = elapsed * (0.2 * speed);
-        mesh.rotation.y = elapsed * (0.3 * speed);
+      // Animate particles - flowing movement
+      const particlePositions = particles.attributes.position.array;
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
         
-        // Floating
-        mesh.position.y += Math.sin(elapsed * (1 + i * 0.5)) * 0.002;
+        // Wave motion
+        particlePositions[i3 + 1] += Math.sin(elapsed + particlePositions[i3]) * 0.01;
+        particlePositions[i3] += Math.cos(elapsed + particlePositions[i3 + 1]) * 0.01;
         
-        // Morphing scale
-        const scale = 1 + Math.sin(elapsed * (1 + i * 0.3)) * 0.1;
-        mesh.scale.set(scale, scale, scale);
+        // Wrap around
+        if (particlePositions[i3 + 1] > 25) particlePositions[i3 + 1] = -25;
+        if (particlePositions[i3] > 25) particlePositions[i3] = -25;
+        if (particlePositions[i3] < -25) particlePositions[i3] = 25;
+      }
+      particles.attributes.position.needsUpdate = true;
+
+      // Rotate particle system
+      particleSystem.rotation.y = elapsed * 0.05;
+      particleSystem.rotation.x = elapsed * 0.02;
+
+      // Animate wave lines
+      lines.forEach((line, i) => {
+        const positions = line.mesh.geometry.attributes.position.array;
+        for (let j = 0; j < 100; j++) {
+          positions[j * 3 + 1] = Math.sin(j * 0.1 + elapsed + line.offset) * 2 + (i - lineCount / 2) * 0.5;
+        }
+        line.mesh.geometry.attributes.position.needsUpdate = true;
+        line.mesh.rotation.z = elapsed * 0.1;
       });
 
-      // Parallax mouse movement
-      camera.position.x += (mouseX.current * 0.8 - camera.position.x) * 0.05;
-      camera.position.y += (-mouseY.current * 0.8 - camera.position.y) * 0.05;
+      // Animate orbs - pulsating
+      orbs.forEach((orb, i) => {
+        const { mesh, speed } = orb;
+        
+        // Floating movement
+        mesh.position.y += Math.sin(elapsed * speed + i) * 0.02;
+        mesh.position.x += Math.cos(elapsed * speed + i) * 0.01;
+        
+        // Pulsating scale
+        const scale = 1 + Math.sin(elapsed * 2 + i) * 0.3;
+        mesh.scale.set(scale, scale, scale);
+        
+        // Rotation
+        mesh.rotation.x = elapsed * speed * 0.5;
+        mesh.rotation.y = elapsed * speed * 0.3;
+      });
+
+      // Mouse parallax
+      camera.position.x += (mouseX.current * 1 - camera.position.x) * 0.05;
+      camera.position.y += (-mouseY.current * 1 - camera.position.y) * 0.05;
       camera.lookAt(scene.position);
+
+      // Pulsating lights
+      pointLight1.intensity = 2 + Math.sin(elapsed * 2) * 0.5;
+      pointLight2.intensity = 2 + Math.cos(elapsed * 2) * 0.5;
 
       renderer.render(scene, camera);
     };
 
     animate();
 
-    // Scroll animations with GSAP
-    objects.forEach((obj, i) => {
-      gsap.to(obj.mesh.position, {
+    // Scroll animations
+    gsap.to(particleSystem.rotation, {
+      scrollTrigger: {
+        trigger: document.body,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1,
+      },
+      y: Math.PI * 4,
+    });
+
+    orbs.forEach((orb, i) => {
+      gsap.to(orb.mesh.position, {
         scrollTrigger: {
           trigger: document.body,
           start: 'top top',
           end: 'bottom bottom',
           scrub: 1.5,
         },
-        y: `+=${i % 2 === 0 ? 6 : -6}`,
-        x: `+=${i % 2 === 0 ? -4 : 4}`,
-      });
-
-      gsap.to(obj.mesh.rotation, {
-        scrollTrigger: {
-          trigger: document.body,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1,
-        },
-        y: Math.PI * 4,
-        z: Math.PI * 2,
+        y: `+=${i % 2 === 0 ? 10 : -10}`,
+        x: `+=${i % 2 === 0 ? -5 : 5}`,
       });
     });
 
-    // Mouse parallax
+    // Mouse move
     const handleMouseMove = (e) => {
       mouseX.current = (e.clientX / window.innerWidth) * 2 - 1;
       mouseY.current = (e.clientY / window.innerHeight) * 2 - 1;
     };
-
     window.addEventListener('mousemove', handleMouseMove);
 
     // Resize
@@ -225,7 +241,6 @@ export const Scene3D = () => {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
-
     window.addEventListener('resize', handleResize);
 
     // Cleanup
@@ -235,9 +250,15 @@ export const Scene3D = () => {
       window.removeEventListener('resize', handleResize);
       ScrollTrigger.getAll().forEach(t => t.kill());
       renderer.dispose();
-      objects.forEach(obj => {
-        obj.mesh.geometry.dispose();
-        obj.mesh.material.dispose();
+      particles.dispose();
+      particleMaterial.dispose();
+      lines.forEach(l => {
+        l.mesh.geometry.dispose();
+        l.mesh.material.dispose();
+      });
+      orbs.forEach(o => {
+        o.mesh.geometry.dispose();
+        o.mesh.material.dispose();
       });
     };
   }, []);
@@ -246,13 +267,28 @@ export const Scene3D = () => {
     <>
       <canvas ref={canvasRef} className="scene-container" />
       
-      {/* More Morphing Blobs */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-purple-600 to-pink-600 opacity-20 blob"></div>
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-20 blob" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-gradient-to-r from-pink-500 to-purple-600 opacity-15 blob" style={{ animationDelay: '4s' }}></div>
-        <div className="absolute top-40 right-1/4 w-64 h-64 bg-gradient-to-r from-cyan-500 to-blue-600 opacity-15 blob" style={{ animationDelay: '6s' }}></div>
-        <div className="absolute bottom-40 left-1/4 w-56 h-56 bg-gradient-to-r from-purple-500 to-pink-500 opacity-10 blob" style={{ animationDelay: '3s' }}></div>
+      {/* CSS GRADIENT MESH - Animated flowing gradients */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none opacity-30">
+        {/* Flowing gradient orbs */}
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute blob"
+            style={{
+              width: `${200 + i * 50}px`,
+              height: `${200 + i * 50}px`,
+              background: `radial-gradient(circle, ${
+                i % 3 === 0 ? 'rgba(102, 126, 234, 0.4)' : 
+                i % 3 === 1 ? 'rgba(240, 147, 251, 0.4)' : 
+                'rgba(0, 212, 255, 0.4)'
+              } 0%, transparent 70%)`,
+              top: `${10 + i * 10}%`,
+              left: `${5 + i * 12}%`,
+              animationDelay: `${i * 0.7}s`,
+              animationDuration: `${8 + i}s`,
+            }}
+          />
+        ))}
       </div>
     </>
   );
