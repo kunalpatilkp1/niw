@@ -1,4 +1,4 @@
-/* Global 3D Scene Styles */
+/* Simple 3D Scene Styles */
 .scene-container {
   position: fixed;
   top: 0;
@@ -12,19 +12,4 @@
 .content-overlay {
   position: relative;
   z-index: 1;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Remove default focus outline, add custom */
-*:focus {
-  outline: none;
-}
-
-*:focus-visible {
-  outline: 2px solid #0EA5E9;
-  outline-offset: 2px;
 }
