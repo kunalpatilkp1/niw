@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FloatingButtons from "./components/FloatingButtons";
 import Scene3D from "./components/Scene3D";
+import CursorTrail from "./components/CursorTrail";
 import HomePage from "./pages/HomePage";
 import ServicesPage from "./pages/ServicesPage";
 import AIMarketingPage from "./pages/AIMarketingPage";
@@ -18,7 +19,6 @@ import ContactPage from "./pages/ContactPage";
 
 function App() {
   useEffect(() => {
-    // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
   }, []);
 
@@ -27,6 +27,9 @@ function App() {
       <BrowserRouter>
         {/* Global 3D Scene Background */}
         <Scene3D />
+        
+        {/* Cursor Trail Effect */}
+        <CursorTrail />
         
         {/* Main Content */}
         <div className="content-overlay">

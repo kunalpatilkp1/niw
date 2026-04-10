@@ -65,69 +65,79 @@ const HomePage = () => {
     <div className="content-overlay" data-testid="home-page">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-32" data-testid="hero-section">
-        {/* 3D Background with CSS animations */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-sky-400/20 rounded-full floating-animation blur-3xl"
-               style={{ animationDelay: '0s', transform: 'translateZ(50px)' }}></div>
-          <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-sky-500/20 rounded-3xl floating-animation blur-3xl"
-               style={{ animationDelay: '2s', transform: 'rotate(45deg) translateZ(30px)' }}></div>
-          <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-sky-300/20 rounded-2xl floating-animation blur-2xl"
-               style={{ animationDelay: '4s', transform: 'rotate(-30deg) translateZ(40px)' }}></div>
-          <div className="absolute top-1/2 right-1/3 w-56 h-56 bg-white/30 rounded-full floating-animation blur-xl"
-               style={{ animationDelay: '1s', transform: 'translateZ(20px)' }}></div>
-        </div>
-
         <motion.div
           style={{ y, opacity }}
           className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 60, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-6 text-gradient-sky" data-testid="hero-heading">
+            <motion.h1 
+              className="text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tighter mb-8 text-gradient" 
+              data-testid="hero-heading"
+              style={{ textShadow: '0 0 80px rgba(102, 126, 234, 0.5)' }}
+            >
               AI-Powered Digital Marketing That Brings More Customers
-            </h1>
-            <p className="text-lg sm:text-xl text-slate-600 mb-8 max-w-3xl mx-auto leading-relaxed" data-testid="hero-subheading">
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-xl sm:text-2xl text-white/80 mb-12 max-w-4xl mx-auto leading-relaxed" 
+              data-testid="hero-subheading"
+            >
               Smart marketing systems that generate leads, boost sales, and grow your business — powered by AI, guided by strategy.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            </motion.p>
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            >
               <Link to="/contact">
                 <motion.button
-                  whileHover={{ scale: 1.05, y: -3 }}
+                  whileHover={{ scale: 1.08, y: -5 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-sky-500 text-white rounded-full font-semibold text-lg shadow-2xl shadow-sky-500/30 hover:bg-sky-600 transition-colors flex items-center gap-2"
+                  className="btn-3d px-10 py-5 rounded-full font-bold text-xl text-white flex items-center gap-3"
                   data-testid="hero-get-started-btn"
                 >
-                  Get Started <ArrowRight size={20} />
+                  Get Started <ArrowRight size={24} />
                 </motion.button>
               </Link>
               <Link to="/pricing">
                 <motion.button
-                  whileHover={{ scale: 1.05, y: -3 }}
+                  whileHover={{ scale: 1.08, y: -5 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 border-2 border-sky-500 text-sky-600 rounded-full font-semibold text-lg hover:bg-sky-50 transition-colors"
+                  className="glass px-10 py-5 rounded-full font-bold text-xl text-white border border-white/30"
                   data-testid="hero-view-packages-btn"
                 >
                   View Packages
                 </motion.button>
               </Link>
-            </div>
-            <div className="flex flex-wrap justify-center gap-8 text-sm">
-              <div className="flex items-center gap-2">
-                <CheckCircle size={20} className="text-sky-500" />
-                <span className="text-slate-700 font-medium">Starting from ₹3,990/week</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={20} className="text-sky-500" />
-                <span className="text-slate-700 font-medium">Setup in 48 Hours</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={20} className="text-sky-500" />
-                <span className="text-slate-700 font-medium">Built for Local Businesses</span>
-              </div>
-            </div>
+            </motion.div>
+            <motion.div 
+              className="flex flex-wrap justify-center gap-10 text-base"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9, duration: 0.8 }}
+            >
+              {[
+                { icon: CheckCircle, text: 'Starting from ₹3,990/week' },
+                { icon: CheckCircle, text: 'Setup in 48 Hours' },
+                { icon: CheckCircle, text: 'Built for Local Businesses' },
+              ].map((item, i) => (
+                <motion.div 
+                  key={i}
+                  className="flex items-center gap-3 glass px-6 py-3 rounded-full"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                >
+                  <item.icon size={24} className="text-purple-400" />
+                  <span className="text-white/90 font-semibold">{item.text}</span>
+                </motion.div>
+              ))}
+            </motion.div>
           </motion.div>
         </motion.div>
       </section>
