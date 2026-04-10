@@ -4,8 +4,8 @@ import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail } from 'lucide-re
 import { useState } from 'react';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, '');
+const API = BACKEND_URL ? `${BACKEND_URL}/api` : '/api';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
