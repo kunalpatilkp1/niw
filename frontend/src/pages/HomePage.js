@@ -2,6 +2,8 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, CheckCircle, Sparkles, TrendingUp, Users, Zap, Instagram, Mail, MessageSquare, Globe, BarChart3, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Marquee from 'react-fast-marquee';
+import Service3DCard from '../components/Service3DCard';
+import Pricing3DCard from '../components/Pricing3DCard';
 
 const HomePage = () => {
   const { scrollYProgress } = useScroll();
@@ -163,22 +165,13 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, idx) => (
-              <motion.div
+              <Service3DCard
                 key={idx}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="glass-effect rounded-3xl p-8 cursor-pointer group"
-                data-testid={`service-card-${idx}`}
-              >
-                <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-sky-500 transition-colors">
-                  <service.icon className="text-sky-500 group-hover:text-white transition-colors" size={32} />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-slate-900">{service.title}</h3>
-                <p className="text-slate-600">{service.desc}</p>
-              </motion.div>
+                icon={service.icon}
+                title={service.title}
+                desc={service.desc}
+                index={idx}
+              />
             ))}
           </div>
         </div>
@@ -239,50 +232,7 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {packages.map((pkg, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.15 }}
-                whileHover={{ scale: pkg.popular ? 1.08 : 1.05, y: -10 }}
-                className={`relative rounded-3xl p-8 ${
-                  pkg.popular ? 'bg-sky-500 text-white shadow-2xl shadow-sky-500/40 scale-105' : 'glass-effect'
-                }`}
-                data-testid={`pricing-card-${pkg.name.toLowerCase()}`}
-              >
-                {pkg.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-slate-900 px-4 py-1 rounded-full text-sm font-bold">
-                    Most Popular
-                  </div>
-                )}
-                <h3 className={`text-2xl font-bold mb-2 ${pkg.popular ? 'text-white' : 'text-slate-900'}`}>{pkg.name}</h3>
-                <div className="mb-4">
-                  <span className={`text-4xl font-extrabold ${pkg.popular ? 'text-white' : 'text-sky-500'}`}>{pkg.price}</span>
-                  <span className={pkg.popular ? 'text-sky-100' : 'text-slate-600'}>{pkg.period}</span>
-                </div>
-                <p className={`mb-6 ${pkg.popular ? 'text-sky-100' : 'text-slate-600'}`}>{pkg.fit}</p>
-                <ul className="space-y-3 mb-8">
-                  {pkg.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <CheckCircle size={20} className={pkg.popular ? 'text-sky-200' : 'text-sky-500'} />
-                      <span className={pkg.popular ? 'text-white' : 'text-slate-700'}>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link to="/pricing">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`w-full py-3 rounded-full font-semibold ${
-                      pkg.popular ? 'bg-white text-sky-500' : 'bg-sky-500 text-white'
-                    }`}
-                    data-testid={`pricing-cta-${pkg.name.toLowerCase()}`}
-                  >
-                    Choose {pkg.name}
-                  </motion.button>
-                </Link>
-              </motion.div>
+              <Pricing3DCard key={idx} pkg={pkg} idx={idx} />
             ))}
           </div>
         </div>
