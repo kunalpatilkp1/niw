@@ -11,13 +11,16 @@ export const Scene3D = () => {
   const rendererRef = useRef(null);
   const cameraRef = useRef(null);
   const shapesRef = useRef([]);
+  const particlesRef = useRef(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xF0F9FF);
+    const gradient = new THREE.Color(0x0a0015); // Deep purple background
+    scene.background = gradient;
+    scene.fog = new THREE.Fog(0x0a0015, 10, 50);
     sceneRef.current = scene;
 
     // Camera
@@ -27,155 +30,205 @@ export const Scene3D = () => {
       0.1,
       1000
     );
-    camera.position.z = 5;
+    camera.position.z = 8;
     cameraRef.current = camera;
 
-    // Renderer
+    // Renderer with antialiasing and alpha
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
       antialias: true,
       alpha: true,
+      powerPreference: 'high-performance',
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
     rendererRef.current = renderer;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    // Rich Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0x38BDF8, 1.5);
-    directionalLight.position.set(5, 5, 5);
-    scene.add(directionalLight);
+    const mainLight = new THREE.DirectionalLight(0xffd700, 2); // Gold
+    mainLight.position.set(10, 10, 5);
+    scene.add(mainLight);
 
-    const pointLight = new THREE.PointLight(0x0EA5E9, 1);
-    pointLight.position.set(-5, -5, -5);
-    scene.add(pointLight);
+    const purpleLight = new THREE.PointLight(0x8b5cf6, 3);
+    purpleLight.position.set(-10, 5, -5);
+    scene.add(purpleLight);
 
-    // Create 3D shapes
+    const blueLight = new THREE.PointLight(0x06b6d4, 2);
+    blueLight.position.set(10, -5, 5);
+    scene.add(blueLight);
+
+    const pinkLight = new THREE.PointLight(0xec4899, 2);
+    pinkLight.position.set(0, 10, -10);
+    scene.add(pinkLight);
+
+    // Particle System
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 1000;
+    const posArray = new Float32Array(particlesCount * 3);
+
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 100;
+    }
+
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.05,
+      color: 0xffd700,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+    });
+
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
+    particlesRef.current = particlesMesh;
+
+    // Create optimized 3D shapes with rich materials
     const shapes = [];
 
-    // Icosahedron (glass material)
-    const icosahedronGeometry = new THREE.IcosahedronGeometry(1, 0);
-    const icosahedronMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x0EA5E9,
-      transparent: true,
-      opacity: 0.6,
-      transmission: 0.9,
-      roughness: 0.1,
-      metalness: 0.1,
-      clearcoat: 1,
-      clearcoatRoughness: 0.1,
-    });
-    const icosahedron = new THREE.Mesh(icosahedronGeometry, icosahedronMaterial);
-    icosahedron.position.set(-3, 2, 0);
-    scene.add(icosahedron);
-    shapes.push(icosahedron);
+    // Crystal-like Icosahedron
+    const ico1 = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.2, 0),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x8b5cf6,
+        transparent: true,
+        opacity: 0.9,
+        transmission: 0.95,
+        roughness: 0,
+        metalness: 0.1,
+        clearcoat: 1,
+        clearcoatRoughness: 0,
+        ior: 2.4,
+        thickness: 1,
+        envMapIntensity: 1.5,
+      })
+    );
+    ico1.position.set(-4, 3, -2);
+    scene.add(ico1);
+    shapes.push(ico1);
 
-    // Torus
-    const torusGeometry = new THREE.TorusGeometry(1, 0.4, 16, 100);
-    const torusMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x38BDF8,
-      transparent: true,
-      opacity: 0.7,
-      transmission: 0.8,
-      roughness: 0.1,
-      metalness: 0.2,
-    });
-    const torus = new THREE.Mesh(torusGeometry, torusMaterial);
-    torus.position.set(3, -1, -2);
+    // Golden Torus
+    const torus = new THREE.Mesh(
+      new THREE.TorusGeometry(1, 0.3, 16, 50),
+      new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        metalness: 1,
+        roughness: 0.1,
+        emissive: 0xffd700,
+        emissiveIntensity: 0.3,
+      })
+    );
+    torus.position.set(4, -2, -3);
     scene.add(torus);
     shapes.push(torus);
 
-    // Sphere
-    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-    const sphereMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x7DD3FC,
-      transparent: true,
-      opacity: 0.5,
-      transmission: 0.95,
-      roughness: 0.05,
-      metalness: 0.1,
-    });
-    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sphere.position.set(0, 3, -3);
+    // Cyan Glass Sphere
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(1.3, 32, 32),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x06b6d4,
+        transparent: true,
+        opacity: 0.7,
+        transmission: 0.98,
+        roughness: 0,
+        metalness: 0,
+        clearcoat: 1,
+        ior: 1.5,
+      })
+    );
+    sphere.position.set(0, 4, -5);
     scene.add(sphere);
     shapes.push(sphere);
 
-    // Octahedron
-    const octahedronGeometry = new THREE.OctahedronGeometry(1);
-    const octahedronMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0EA5E9,
-      roughness: 0.2,
-      metalness: 0.8,
-    });
-    const octahedron = new THREE.Mesh(octahedronGeometry, octahedronMaterial);
-    octahedron.position.set(-4, -2, -1);
-    scene.add(octahedron);
-    shapes.push(octahedron);
+    // Pink Diamond Octahedron
+    const octa = new THREE.Mesh(
+      new THREE.OctahedronGeometry(1.1),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xec4899,
+        transparent: true,
+        opacity: 0.85,
+        metalness: 0.9,
+        roughness: 0.05,
+        clearcoat: 1,
+        emissive: 0xec4899,
+        emissiveIntensity: 0.2,
+      })
+    );
+    octa.position.set(-5, -3, -1);
+    scene.add(octa);
+    shapes.push(octa);
 
-    // Dodecahedron
-    const dodecahedronGeometry = new THREE.DodecahedronGeometry(1);
-    const dodecahedronMaterial = new THREE.MeshStandardMaterial({
-      color: 0xFFFFFF,
-      roughness: 0.3,
-      metalness: 0.7,
-    });
-    const dodecahedron = new THREE.Mesh(dodecahedronGeometry, dodecahedronMaterial);
-    dodecahedron.position.set(4, 2, -4);
-    scene.add(dodecahedron);
-    shapes.push(dodecahedron);
-
-    // Box
-    const boxGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-    const boxMaterial = new THREE.MeshStandardMaterial({
-      color: 0xE0F2FE,
-      roughness: 0.2,
-      metalness: 0.5,
-    });
-    const box = new THREE.Mesh(boxGeometry, boxMaterial);
-    box.position.set(-2, -3, -2);
-    scene.add(box);
-    shapes.push(box);
+    // Emerald TorusKnot
+    const knot = new THREE.Mesh(
+      new THREE.TorusKnotGeometry(0.7, 0.25, 64, 8),
+      new THREE.MeshStandardMaterial({
+        color: 0x10b981,
+        metalness: 0.9,
+        roughness: 0.1,
+        emissive: 0x10b981,
+        emissiveIntensity: 0.3,
+      })
+    );
+    knot.position.set(5, 3, -4);
+    scene.add(knot);
+    shapes.push(knot);
 
     shapesRef.current = shapes;
 
-    // Animation loop
+    // Animation loop with optimized performance
     const clock = new THREE.Clock();
+    let lastTime = 0;
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS;
     
-    const animate = () => {
+    const animate = (currentTime) => {
       requestAnimationFrame(animate);
+      
+      const deltaTime = currentTime - lastTime;
+      if (deltaTime < frameInterval) return;
+      lastTime = currentTime - (deltaTime % frameInterval);
       
       const elapsedTime = clock.getElapsedTime();
 
-      // Continuous rotation and floating
+      // Smooth continuous rotation
       shapes.forEach((shape, index) => {
-        const speed = 0.5 + index * 0.2;
-        shape.rotation.x = Math.sin(elapsedTime * speed) * 0.5;
-        shape.rotation.y = elapsedTime * speed * 0.3;
-        shape.rotation.z = Math.cos(elapsedTime * speed * 0.5) * 0.3;
+        const speed = 0.3 + index * 0.15;
+        shape.rotation.x = Math.sin(elapsedTime * speed * 0.5) * 0.3;
+        shape.rotation.y = elapsedTime * speed * 0.4;
+        shape.rotation.z = Math.cos(elapsedTime * speed * 0.3) * 0.2;
         
-        // Floating effect
-        shape.position.y += Math.sin(elapsedTime * speed + index) * 0.002;
+        // Gentle floating
+        const floatSpeed = speed * 0.8;
+        shape.position.y += Math.sin(elapsedTime * floatSpeed + index) * 0.001;
       });
+
+      // Rotate particles slowly
+      if (particlesRef.current) {
+        particlesRef.current.rotation.y = elapsedTime * 0.05;
+        particlesRef.current.rotation.x = elapsedTime * 0.03;
+      }
 
       renderer.render(scene, camera);
     };
 
-    animate();
+    animate(0);
 
-    // Scroll animations with GSAP
+    // Smooth scroll animations
     shapes.forEach((shape, index) => {
       gsap.to(shape.position, {
         scrollTrigger: {
           trigger: document.body,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 1,
+          scrub: 2,
         },
-        y: `+=${(index % 2 === 0 ? 3 : -3)}`,
-        x: `+=${(index % 2 === 0 ? -2 : 2)}`,
-        z: `+=${(index % 2 === 0 ? 1 : -1)}`,
+        y: `+=${(index % 2 === 0 ? 5 : -5)}`,
+        x: `+=${(index % 2 === 0 ? -3 : 3)}`,
+        z: `+=${(index % 2 === 0 ? 2 : -2)}`,
       });
 
       gsap.to(shape.rotation, {
@@ -183,26 +236,36 @@ export const Scene3D = () => {
           trigger: document.body,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 1,
+          scrub: 2,
         },
-        y: Math.PI * 4,
+        y: Math.PI * 3,
         x: Math.PI * 2,
       });
     });
 
-    // Mouse parallax effect
-    const handleMouseMove = (event) => {
-      const x = (event.clientX / window.innerWidth) * 2 - 1;
-      const y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // Smooth mouse parallax
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
 
-      gsap.to(camera.position, {
-        x: x * 0.5,
-        y: y * 0.5,
-        duration: 1,
-        ease: 'power2.out',
-      });
+    const handleMouseMove = (event) => {
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
     };
 
+    const updateCamera = () => {
+      targetX += (mouseX - targetX) * 0.05;
+      targetY += (mouseY - targetY) * 0.05;
+      
+      camera.position.x = targetX * 0.5;
+      camera.position.y = targetY * 0.5;
+      camera.lookAt(scene.position);
+      
+      requestAnimationFrame(updateCamera);
+    };
+
+    updateCamera();
     window.addEventListener('mousemove', handleMouseMove);
 
     // Handle resize
@@ -220,6 +283,8 @@ export const Scene3D = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
       renderer.dispose();
+      particlesGeometry.dispose();
+      particlesMaterial.dispose();
       shapes.forEach(shape => {
         shape.geometry.dispose();
         shape.material.dispose();

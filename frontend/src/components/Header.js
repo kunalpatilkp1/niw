@@ -34,17 +34,17 @@ const Header = () => {
       <motion.div
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="bg-sky-500 text-white py-2 px-4"
+        className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-2.5 px-4"
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center text-sm">
           <div className="flex items-center gap-6">
-            <span>📞 Call/WhatsApp: +91 98765 43210</span>
-            <span className="hidden md:block text-sky-100">AI-Powered Digital Marketing for Growing Businesses</span>
+            <span className="font-medium">📞 Call/WhatsApp: +91 98765 43210</span>
+            <span className="hidden md:block text-white/90">AI-Powered Digital Marketing for Growing Businesses</span>
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-white text-sky-600 px-4 py-1 rounded-full font-medium text-sm"
+            className="bg-white text-purple-600 px-5 py-1.5 rounded-full font-bold text-sm glow-purple"
             data-testid="top-book-consultation-btn"
           >
             Book Free Consultation
@@ -56,7 +56,7 @@ const Header = () => {
       <motion.header
         style={{ y: headerY }}
         className={`sticky top-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'glass-effect shadow-lg' : 'bg-white/90 backdrop-blur-md'
+          isScrolled ? 'glass-effect shadow-2xl' : 'bg-black/50 backdrop-blur-xl'
         }`}
       >
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,10 +68,10 @@ const Header = () => {
                 className="flex items-center"
                 data-testid="logo-link"
               >
-                <div className="text-3xl font-extrabold text-gradient-sky tracking-tighter">
+                <div className="text-3xl font-extrabold text-gradient-rich tracking-tighter">
                   NIW
                 </div>
-                <div className="ml-2 text-xs text-slate-600 hidden sm:block">
+                <div className="ml-2 text-xs text-gray-300 hidden sm:block font-semibold">
                   Next In Wave
                 </div>
               </motion.div>
@@ -82,9 +82,9 @@ const Header = () => {
               {navLinks.map((link) => (
                 <Link key={link.path} to={link.path}>
                   <motion.span
-                    whileHover={{ scale: 1.05, color: '#0EA5E9' }}
-                    className={`text-sm font-medium transition-colors ${
-                      location.pathname === link.path ? 'text-sky-500' : 'text-slate-700 hover:text-sky-500'
+                    whileHover={{ scale: 1.05, color: '#a78bfa' }}
+                    className={`text-sm font-semibold transition-colors ${
+                      location.pathname === link.path ? 'text-purple-400' : 'text-gray-200 hover:text-purple-300'
                     }`}
                     data-testid={`nav-${link.name.toLowerCase().replace(/ /g, '-')}`}
                   >
@@ -100,7 +100,7 @@ const Header = () => {
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-2.5 bg-sky-500 text-white rounded-full font-medium text-sm shadow-lg shadow-sky-500/30 hover:bg-sky-600 transition-colors"
+                  className="btn-premium px-6 py-2.5 rounded-full font-bold text-sm text-white"
                   data-testid="header-get-started-btn"
                 >
                   Get Started
@@ -112,7 +112,7 @@ const Header = () => {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-2.5 border-2 border-sky-500 text-sky-500 rounded-full font-medium text-sm hover:bg-sky-50 transition-colors"
+                className="px-6 py-2.5 border-2 border-purple-400 text-purple-300 rounded-full font-bold text-sm hover:bg-purple-500/20 transition-colors"
                 data-testid="header-whatsapp-btn"
               >
                 WhatsApp Us
@@ -123,7 +123,7 @@ const Header = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-slate-700"
+              className="lg:hidden text-white"
               data-testid="mobile-menu-toggle"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -135,19 +135,19 @@ const Header = () => {
         <motion.div
           initial={false}
           animate={{ height: isMobileMenuOpen ? 'auto' : 0 }}
-          className="lg:hidden overflow-hidden bg-white border-t"
+          className="lg:hidden overflow-hidden bg-black/95 backdrop-blur-xl border-t border-purple-500/30"
         >
           <div className="px-4 py-6 space-y-4">
             {navLinks.map((link) => (
               <Link key={link.path} to={link.path} onClick={() => setIsMobileMenuOpen(false)}>
-                <div className="text-slate-700 hover:text-sky-500 font-medium">
+                <div className="text-gray-200 hover:text-purple-400 font-semibold transition-colors">
                   {link.name}
                 </div>
               </Link>
             ))}
             <div className="flex flex-col gap-3 pt-4">
               <Link to="/contact">
-                <button className="w-full px-6 py-3 bg-sky-500 text-white rounded-full font-medium" data-testid="mobile-get-started-btn">
+                <button className="w-full btn-premium px-6 py-3 rounded-full font-bold text-white" data-testid="mobile-get-started-btn">
                   Get Started
                 </button>
               </Link>
@@ -155,7 +155,7 @@ const Header = () => {
                 href="https://wa.me/919876543210"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full px-6 py-3 border-2 border-sky-500 text-sky-500 rounded-full font-medium text-center"
+                className="w-full px-6 py-3 border-2 border-purple-400 text-purple-300 rounded-full font-bold text-center hover:bg-purple-500/20 transition-colors"
                 data-testid="mobile-whatsapp-btn"
               >
                 WhatsApp Us
