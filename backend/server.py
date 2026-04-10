@@ -1,12 +1,12 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
@@ -27,44 +27,130 @@ api_router = APIRouter(prefix="/api")
 
 
 # Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+class ContactForm(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
+    name: str
+    business_name: Optional[str] = None
+    industry: Optional[str] = None
+    city: Optional[str] = None
+    phone: str
+    email: EmailStr
+    website: Optional[str] = None
+    services_needed: Optional[List[str]] = []
+    preferred_package: Optional[str] = None
+    message: Optional[str] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class ContactFormCreate(BaseModel):
+    name: str
+    business_name: Optional[str] = None
+    industry: Optional[str] = None
+    city: Optional[str] = None
+    phone: str
+    email: EmailStr
+    website: Optional[str] = None
+    services_needed: Optional[List[str]] = []
+    preferred_package: Optional[str] = None
+    message: Optional[str] = None
 
-# Add your routes to the router instead of directly to app
+class NewsletterSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: EmailStr
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class NewsletterSubscriptionCreate(BaseModel):
+    email: EmailStr
+
+class AffiliateRegistration(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: EmailStr
+    phone: str
+    experience: Optional[str] = None
+    referral_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8].upper())
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class AffiliateRegistrationCreate(BaseModel):
+    name: str
+    email: EmailStr
+    phone: str
+    experience: Optional[str] = None
+
+class ConsultationBooking(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: EmailStr
+    phone: str
+    business_type: Optional[str] = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ConsultationBookingCreate(BaseModel):
+    name: str
+    email: EmailStr
+    phone: str
+    business_type: Optional[str] = None
+
+
+# Routes
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "NIW AI Marketing API"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+@api_router.post("/contact", response_model=ContactForm)
+async def create_contact(input: ContactFormCreate):
+    contact_dict = input.model_dump()
+    contact_obj = ContactForm(**contact_dict)
     
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
+    doc = contact_obj.model_dump()
     doc['timestamp'] = doc['timestamp'].isoformat()
     
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+    await db.contacts.insert_one(doc)
+    return contact_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+@api_router.post("/newsletter", response_model=NewsletterSubscription)
+async def subscribe_newsletter(input: NewsletterSubscriptionCreate):
+    existing = await db.newsletters.find_one({"email": input.email}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already subscribed")
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    subscription_dict = input.model_dump()
+    subscription_obj = NewsletterSubscription(**subscription_dict)
     
-    return status_checks
+    doc = subscription_obj.model_dump()
+    doc['timestamp'] = doc['timestamp'].isoformat()
+    
+    await db.newsletters.insert_one(doc)
+    return subscription_obj
+
+@api_router.post("/affiliate", response_model=AffiliateRegistration)
+async def register_affiliate(input: AffiliateRegistrationCreate):
+    affiliate_dict = input.model_dump()
+    affiliate_obj = AffiliateRegistration(**affiliate_dict)
+    
+    doc = affiliate_obj.model_dump()
+    doc['timestamp'] = doc['timestamp'].isoformat()
+    
+    await db.affiliates.insert_one(doc)
+    return affiliate_obj
+
+@api_router.post("/consultation", response_model=ConsultationBooking)
+async def book_consultation(input: ConsultationBookingCreate):
+    booking_dict = input.model_dump()
+    booking_obj = ConsultationBooking(**booking_dict)
+    
+    doc = booking_obj.model_dump()
+    doc['timestamp'] = doc['timestamp'].isoformat()
+    
+    await db.consultations.insert_one(doc)
+    return booking_obj
 
 # Include the router in the main app
 app.include_router(api_router)

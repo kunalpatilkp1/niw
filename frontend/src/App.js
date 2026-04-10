@@ -1,51 +1,51 @@
-import { useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import { useEffect } from "react";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import FloatingButtons from "./components/FloatingButtons";
+import Scene3D from "./components/Scene3D";
+import HomePage from "./pages/HomePage";
+import ServicesPage from "./pages/ServicesPage";
+import AIMarketingPage from "./pages/AIMarketingPage";
+import PricingPage from "./pages/PricingPage";
+import IndustriesPage from "./pages/IndustriesPage";
+import HowItWorksPage from "./pages/HowItWorksPage";
+import ResultsPage from "./pages/ResultsPage";
+import AffiliatePage from "./pages/AffiliatePage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
+function App() {
   useEffect(() => {
-    helloWorldApi();
+    // Smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
   }, []);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
     <div className="App">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        {/* Global 3D Scene Background */}
+        <Scene3D />
+        
+        {/* Main Content */}
+        <div className="content-overlay">
+          <Header />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/ai-marketing" element={<AIMarketingPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/industries" element={<IndustriesPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/results" element={<ResultsPage />} />
+            <Route path="/affiliate" element={<AffiliatePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Routes>
+          <Footer />
+          <FloatingButtons />
+        </div>
       </BrowserRouter>
     </div>
   );
