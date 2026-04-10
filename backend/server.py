@@ -15,9 +15,10 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+mongo_url = os.getenv('MONGO_URL')
+db_name = os.getenv('DB_NAME')
+client = AsyncIOMotorClient(mongo_url) if mongo_url else None
+db = client[db_name] if client and db_name else None
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -100,12 +101,22 @@ class ConsultationBookingCreate(BaseModel):
 
 
 # Routes
+
+
+def ensure_database_configured():
+    if db is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Database is not configured. Set MONGO_URL and DB_NAME environment variables.",
+        )
+
 @api_router.get("/")
 async def root():
     return {"message": "NIW AI Marketing API"}
 
 @api_router.post("/contact", response_model=ContactForm)
 async def create_contact(input: ContactFormCreate):
+    ensure_database_configured()
     contact_dict = input.model_dump()
     contact_obj = ContactForm(**contact_dict)
     
@@ -117,6 +128,7 @@ async def create_contact(input: ContactFormCreate):
 
 @api_router.post("/newsletter", response_model=NewsletterSubscription)
 async def subscribe_newsletter(input: NewsletterSubscriptionCreate):
+    ensure_database_configured()
     existing = await db.newsletters.find_one({"email": input.email}, {"_id": 0})
     if existing:
         raise HTTPException(status_code=400, detail="Email already subscribed")
@@ -132,6 +144,7 @@ async def subscribe_newsletter(input: NewsletterSubscriptionCreate):
 
 @api_router.post("/affiliate", response_model=AffiliateRegistration)
 async def register_affiliate(input: AffiliateRegistrationCreate):
+    ensure_database_configured()
     affiliate_dict = input.model_dump()
     affiliate_obj = AffiliateRegistration(**affiliate_dict)
     
@@ -143,6 +156,7 @@ async def register_affiliate(input: AffiliateRegistrationCreate):
 
 @api_router.post("/consultation", response_model=ConsultationBooking)
 async def book_consultation(input: ConsultationBookingCreate):
+    ensure_database_configured()
     booking_dict = input.model_dump()
     booking_obj = ConsultationBooking(**booking_dict)
     
@@ -158,7 +172,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=[origin.strip() for origin in os.environ.get('CORS_ORIGINS', '*').split(',') if origin.strip()],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -170,6 +184,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_checks():
+    if db is None:
+        logger.warning("MONGO_URL/DB_NAME are not configured; API write routes will return HTTP 500 until set.")
+
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    if client is not None:
+        client.close()
